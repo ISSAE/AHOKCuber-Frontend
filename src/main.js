@@ -6,10 +6,11 @@ import store from './store'
 Vue.config.productionTip = false
 
 import * as VueGoogleMaps from 'vue2-google-maps'
+import { GMAPS_API_KEY } from "@/config.js";
 
 Vue.use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyD5IRKNiHqzDYWQK8iRi_PKHJIcxcvc87o',
+    key: GMAPS_API_KEY,
     libraries: 'places', // This is required if you use the Autocomplete plugin
     // OR: libraries: 'places,drawing'
     // OR: libraries: 'places,drawing,visualization'
