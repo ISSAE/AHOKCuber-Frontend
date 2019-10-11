@@ -1,18 +1,74 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+    <div>
+        <label>
+            AutoComplete
+            <GmapAutocomplete ref="autocomplete" :position.sync="markers[0].position" @keyup.enter="usePlace" @place_changed="setPlace">
+            </GmapAutocomplete>
+            <button @click="usePlace">Add</button>
+        </label>
+        <br/>
+
+        <gmap-map
+        :center="center"
+        :zoom="7"
+        map-type-id="terrain"
+        style="width: 100%; height: 500px"
+        >
+        <gmap-marker
+        @dragend="updateMaker" 
+        :key="index"
+        v-for="(m, index) in markers"
+        :position="m.position"
+        :clickable="true"
+        :draggable="true"
+        @click="center=m.position"
+        ></gmap-marker>
+
+    </gmap-map>
+
+</div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
 
-export default {
-  name: 'home',
-  components: {
-    HelloWorld
-  }
+    export default {
+        data() {
+            return {
+                center: {lat: 10.0, lng: 10.0},
+                markers: [{
+                    position: {lat: 11.0, lng: 11.0}
+                }],
+                place: null,
+            }
+        },
+        description: 'Autocomplete Example (#164)',
+        methods: {
+            setPlace(place) {
+                this.place = place
+            },
+            setDescription(description) {
+                this.description = description;
+            },
+            usePlace(place) {
+                if (this.place) {
+                    var newPostion = {
+                      lat: this.place.geometry.location.lat(),
+                      lng: this.place.geometry.location.lng(),
+                  };
+                  this.center = newPostion;
+                  this.markers[0].position =  newPostion;
+                  this.place = null;
+              }
+          },
+updateMaker: function(event) {
+   let geocoder = new google.maps.Geocoder()
+   geocoder.geocode({ 'latLng': event.latLng }, (result, status) => {
+       if (status ===google.maps.GeocoderStatus.OK) {
+          // accessing autocomplete reference and populating the address
+          this.$refs.autocomplete.$refs.input.value = result[0].formatted_address
+       }
+   })
+}
+    }
 }
 </script>
