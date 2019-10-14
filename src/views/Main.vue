@@ -9,9 +9,12 @@
       <router-link class="btn btn-block" style="background-color: white" to="/login">
       Se connecter
       </router-link>
-      <router-link class="btn btn-block btn-primary" to="/register">
-      Créer un compte
+      <router-link class="btn btn-block btn-primary" to="/register-client">
+      Créer un compte client
       </router-link>
+      <router-link class="btn btn-block btn-warning" to="/register-driver">
+      Créer un compte conducteur
+      </router-link>      
     </div>
   </div>
 </template>
