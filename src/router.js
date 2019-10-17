@@ -1,12 +1,14 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Home.vue'
 import Login from './views/Login.vue'
 import RegisterDriver from './views/RegisterDriver.vue'
 import RegisterClient from './views/RegisterClient.vue'
 import Main from './views/Main.vue'
 import ClientMyProfile from './views/ClientMyProfile.vue'
 import DriverMyProfile from './views/DriverMyProfile.vue'
+import WhereTo from './views/WhereTo.vue'
+import TripSearch from './views/TripSearch.vue'
+import ConfirmTrip from './views/ConfirmTrip.vue'
 
 Vue.use(Router)
 
@@ -42,6 +44,21 @@ export default new Router({
       name: 'driver-my-profile',
       component: DriverMyProfile
     },    
+    {
+      path: '/where-to',
+      name: 'where-to',
+      component: WhereTo
+    },
+    {
+      path: '/trip-search',
+      name: 'trip-search',
+      component: TripSearch
+    },
+    {
+      path: '/confirm-trip',
+      name: 'confirm-trip',
+      component: ConfirmTrip
+    },
     {
       path: '/about',
       name: 'about',

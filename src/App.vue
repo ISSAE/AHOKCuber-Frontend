@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="container-fluid"> 
+  <div id="app" class="container-fluid">
     <router-view/>
   </div>
 </template>
@@ -14,5 +14,8 @@
   background: #e3e3e3;
   margin: 0px;
   padding: 0px;
+}
+.fa-thin {
+  -webkit-text-stroke: 4px #e3e3e3;
 }
 </style>
