@@ -1,4 +1,3 @@
-import { gmapApi } from "vue2-google-maps";
 
 const state = {
     mapCenter: null,
@@ -6,7 +5,6 @@ const state = {
     directionsService: null,
     start: null,
     destination: null,
-    google: gmapApi,
 }
 
 const getters = {
@@ -20,13 +18,17 @@ const actions = {
     initDirectionServices({ commit }) {
         commit('INIT_DIRECTION_SERVICES')
     },
-    setMapCenter({ state, commit }, { lat, lng }) {
+    setMapCenter({ commit }, { lat, lng }) {
         commit('SET_MAP_CENTER', { lat, lng })
     },
-    setStart({ state, commit }, { lat, lng }) {
-        commit('SET_START', { lat, lng });
+    /**
+     * Sets the start position of the trip in the store
+     * @param {*} coords - the map coordinates as {lat, lng}
+     */
+    setStart({ commit }, coords) { // coords = {lat, lng} object
+        commit('SET_START', coords);
     },
-    setDestination({ state, commit }, { lat, lng }) {
+    setDestination({ commit }, { lat, lng }) {
         commit('SET_DESTINATION', { lat, lng });
     },
 }
@@ -35,14 +37,16 @@ const actions = {
 const mutations = {
 
     'INIT_DIRECTION_SERVICES'(state) {
-        state.directionsDisplay = new state.google.maps.DirectionsRenderer();
-        state.directionsService = new state.google.maps.DirectionsService();
+        state.directionsDisplay = new window.google.maps.DirectionsRenderer();
+        state.directionsService = new window.google.maps.DirectionsService();
+
     },
-    'SET_START'(state, { lat, lng }) {
-        state.start = { lat, lng };
+    'SET_START'(state, coords) { // {lat, lng}
+        state.start = coords;
     },
     'SET_DESTINATION'(state, { lat, lng }) {
-        state.end = { lat, lng };
+        state.destination = { lat, lng };
+        console.log("destination: ", state.destination);
     },
     'SET_MAP_CENTER'(state, { lat, lng }) {
         state.mapCenter = { lat, lng };
@@ -50,7 +54,7 @@ const mutations = {
 }
 
 export default {
-    namespaced: true,
+    namespaced: false,
     state,
     getters,
     actions,

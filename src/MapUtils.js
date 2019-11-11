@@ -1,4 +1,3 @@
-import { gmapApi } from "vue2-google-maps";
 import { mapState } from "vuex";
 export default {
     data() {
@@ -12,7 +11,12 @@ export default {
         drawRouteAsync(mapRef) {
             return new Promise((resolve, reject) => {
                 if (!this.directionsService || !this.directionsDisplay || !this.start || !this.destination) {
-                    reject();
+                    reject({
+                        directionsService: this.directionsService,
+                        directionsDisplay: this.directionsDisplay,
+                        start: this.start,
+                        destination: this.destination
+                    });
                 } else {
                     this.$nextTick(() => {
                         mapRef.$mapPromise.then(() => {
@@ -64,11 +68,10 @@ export default {
         }
     },
     computed: {
-        google: gmapApi,
         autocompleteOptions() {
-            var southWest = new this.google.maps.LatLng(34.524510, 36.239550);
-            var northEast = new this.google.maps.LatLng(33.270020, 35.194328);
-            var lebanonBounds = new this.google.maps.LatLngBounds(southWest, northEast);
+            var southWest = new window.google.maps.LatLng(34.524510, 36.239550);
+            var northEast = new window.google.maps.LatLng(33.270020, 35.194328);
+            var lebanonBounds = new window.google.maps.LatLngBounds(southWest, northEast);
 
             var options = {
                 bounds: lebanonBounds,

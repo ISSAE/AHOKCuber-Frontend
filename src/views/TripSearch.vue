@@ -13,30 +13,69 @@
     <div class="body">
       <div class="row mr-0">
         <div class="col-12">
-            <GmapAutocomplete
-              class="trip-search-textfield"
-              ref="autocomplete"
-              placeholder="Point de départ"
-            ></GmapAutocomplete>
+          <GmapAutocomplete
+            class="trip-search-textfield"
+            ref="autocomplete"
+            placeholder="Point de départ"
+            :value="'Position actuelle'"
+            @place_changed="setStart"
+            :options="autocompleteOptions"
+          ></GmapAutocomplete>
         </div>
         <div class="col-12">
-            <GmapAutocomplete
-              class="trip-search-textfield"
-              ref="autocomplete"
-              placeholder="Où aller ?"
-            ></GmapAutocomplete>
-        </div>        
+          <GmapAutocomplete
+            class="trip-search-textfield"
+            ref="autocomplete"
+            placeholder="Où aller ?"
+            autofocus
+            @place_changed="setDestination"
+            :options="autocompleteOptions"
+          ></GmapAutocomplete>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   data() {
     return {};
   },
-  methods: {}
+  created() {
+    this.$store.dispatch("initDirectionServices");
+    this.$store.dispatch("setStart", null);
+  },
+  methods: {
+    setDestination(place) {
+      let coords = this.getPlaceCoordinates(place);
+      let destination = coords;
+     let start = this.start;
+     console.log('start: ', start);
+      if(start == null) {
+       this.getCurrentLocationAsync().then(pos => {
+         start = pos;
+         this.$store.dispatch("setStart", start);
+         this.$store.dispatch("setDestination", destination);
+         this.$router.push("/confirm-trip");
+       }); 
+      } else {
+         this.$store.dispatch("setDestination", destination);
+         this.$router.push("/confirm-trip");        
+      }
+      
+    },
+    setStart(place) {
+      let coords = this.getPlaceCoordinates(place);
+      this.$store.dispatch("setStart", coords);
+    }
+  },
+  computed: {
+  ...mapState({
+    start: state => state.mapStore.start
+  })
+}
 };
 </script>
 

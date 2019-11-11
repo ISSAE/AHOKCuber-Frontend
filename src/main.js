@@ -1,13 +1,14 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import store from './store'
-
+import store from './store/index'
+import MapUtils from './MapUtils';
 Vue.config.productionTip = false
 
 import * as VueGoogleMaps from 'vue2-google-maps'
 import { GMAPS_API_KEY } from "@/config.js";
 
+Vue.mixin(MapUtils);
 Vue.use(VueGoogleMaps, {
   load: {
     key: GMAPS_API_KEY,
@@ -39,4 +40,4 @@ new Vue({
   render: h => h(App)
 }).$mount('#app')
 
-router.push("/confirm-trip")
+router.push("/where-to")

@@ -10,7 +10,7 @@ const vuexLocal = new VuexPersistence({
 })
 export default new Vuex.Store({
   modules: {
-    map
+    mapStore: map
   },
   strict: debug,
   plugins: [vuexLocal.plugin]

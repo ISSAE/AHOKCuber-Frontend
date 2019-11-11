@@ -2,7 +2,7 @@
   <div class="confirm-trip-screen">
     <div class="header d-flex justify-content-between">
       <div>
-        <router-link to="/">
+        <router-link @click="$router.go(-1)">
           <i class="fa fa-arrow-left"></i>
         </router-link>
         <b style="margin-left: 12px">Confirmez votre voyage</b>
@@ -10,6 +10,7 @@
     </div>
     <div class="body">
       <gmap-map
+      ref="map"
         :center="{lat: 0, lng: 0}"
         :zoom="7"
         map-type-id="terrain"
@@ -24,11 +25,23 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   data() {
     return {};
   },
-  methods: {}
+  mounted() {
+    
+    this.drawRouteAsync(this.$refs.map, this.start, this.destination);
+  },
+  methods: {},
+  computed: {
+    ...mapState({
+      mapCenter: state => state.mapStore.mapCenter,
+      start: state => state.mapStore.start,
+      destination: state => state.mapStore.destination
+    })
+  }  
 };
 </script>
 
