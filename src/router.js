@@ -9,6 +9,8 @@ import DriverMyProfile from './views/DriverMyProfile.vue'
 import WhereTo from './views/WhereTo.vue'
 import TripSearch from './views/TripSearch.vue'
 import ConfirmTrip from './views/ConfirmTrip.vue'
+import ChooseDriver from './views/ChooseDriver.vue'
+import DriverComing from './views/DriverComing.vue'
 
 Vue.use(Router)
 
@@ -58,6 +60,16 @@ export default new Router({
       path: '/confirm-trip',
       name: 'confirm-trip',
       component: ConfirmTrip
+    },
+    {
+      path: '/choose-driver',
+      name: 'choose-driver',
+      component: ChooseDriver
+    },
+    {
+      path: '/driver-coming',
+      name: 'driver-coming',
+      component: DriverComing
     },
     {
       path: '/about',

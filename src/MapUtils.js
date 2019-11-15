@@ -5,7 +5,7 @@ export default {
     },
     methods: {
         /**
-         * 
+         * Resolves with a DirectionsResult object
          * @param {object} mapRef - ref to map component
          */
         drawRouteAsync(mapRef) {
@@ -21,16 +21,21 @@ export default {
                     this.$nextTick(() => {
                         mapRef.$mapPromise.then(() => {
                             this.directionsDisplay.setMap(mapRef.$mapObject);
+                            // this.trafficLayer.setMap(mapRef.$mapObject);
                             this.directionsService.route(
                                 {
                                     origin: this.start,
                                     destination: this.destination,
-                                    travelMode: "DRIVING"
+                                    travelMode: "DRIVING",
+                                    drivingOptions: {
+                                        departureTime: new Date(Date.now()),
+                                        trafficModel: 'optimistic'
+                                    }
                                 },
                                 (response, status) => {
                                     if (status === "OK") {
                                         this.directionsDisplay.setDirections(response);
-                                        resolve();
+                                        resolve(response);
                                     } else {
                                         reject(status);
                                     }

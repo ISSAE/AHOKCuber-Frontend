@@ -52,7 +52,6 @@ export default {
       let coords = this.getPlaceCoordinates(place);
       let destination = coords;
      let start = this.start;
-     console.log('start: ', start);
       if(start == null) {
        this.getCurrentLocationAsync().then(pos => {
          start = pos;

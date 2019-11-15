@@ -115,3 +115,53 @@ export function updateDriverProfileAsync(payload) {
         resolve({body: {status: "success"}});
     });    
 }
+/**
+ * Requests a list of candidate drivers for a start and end geolocation points
+ * @param {object} payload - trip data
+ * @param {object} payload.start - the start location object
+ * @param {double} payload.start.lng - the start location longtitude
+ * @param {double} payload.start.lat - the start location latitude
+ * @param {object} payload.end - the end location object
+ * @param {double} payload.end.lng - the end location longtitude
+ * @param {double} payload.end.lat - the end location latitude 
+ */
+export function getCandidateDriversAsync(payload) {
+    const driversExampleResponse = {drivers: []};
+    driversExampleResponse.drivers.push({
+        id: 1,
+        gender: "male",
+        first_name: "Adnan",
+        last_name: "Hamzeh",
+        phone_number: "10103904",
+        car_model: "Renault Clio 2010",
+        rating: 5, // 0 to 5
+    });
+    driversExampleResponse.drivers.push({
+        id: 1,
+        gender: "female",
+        first_name: "Samira",
+        last_name: "Abou Samra",
+        phone_number: "02255420",
+        car_model: "BMW E39 2002",
+        rating: 4
+    });
+    return new Promise((resolve, reject) => {
+        resolve({body: {status: "success",
+        drivers: driversExampleResponse.drivers
+        }});
+    });    
+}
+
+/**
+ * Requests approval from the client to the driver
+ * This request is long-polled and waits for the driver's confirmation
+ * @param {object} driver - the driver object
+ * @param {integer} driver.id - the driver's ID 
+ */
+export function requestCandidateDriverApproval(driver) {
+    return new Promise((resolve, reject) => {
+        resolve({body: {status: "success",
+        driverResponse: {accepted: true, driver: driver}
+        }});
+    });    
+}

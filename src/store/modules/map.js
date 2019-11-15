@@ -5,6 +5,8 @@ const state = {
     directionsService: null,
     start: null,
     destination: null,
+    directionsData: null,
+    driver: null
 }
 
 const getters = {
@@ -31,6 +33,12 @@ const actions = {
     setDestination({ commit }, { lat, lng }) {
         commit('SET_DESTINATION', { lat, lng });
     },
+    setDirectionsData({ commit }, directionsData) {
+        commit('SET_DIRECTIONS_DATA', directionsData);
+    },
+    setDriver({ commit }, driver) {
+        commit('SET_DRIVER', driver);
+    }
 }
 
 // mutations
@@ -46,10 +54,15 @@ const mutations = {
     },
     'SET_DESTINATION'(state, { lat, lng }) {
         state.destination = { lat, lng };
-        console.log("destination: ", state.destination);
     },
     'SET_MAP_CENTER'(state, { lat, lng }) {
         state.mapCenter = { lat, lng };
+    },
+    'SET_DIRECTIONS_DATA'(state, directionsData) {
+        state.directionsData = directionsData;
+    },
+    'SET_DRIVER'(state, driver) {
+        state.driver = driver;
     }
 }
 

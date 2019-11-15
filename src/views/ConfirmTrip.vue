@@ -2,9 +2,9 @@
   <div class="confirm-trip-screen">
     <div class="header d-flex justify-content-between">
       <div>
-        <router-link @click="$router.go(-1)">
+        <a href="javascript:void(0);" @click="$router.go(-1)">
           <i class="fa fa-arrow-left"></i>
-        </router-link>
+        </a>
         <b style="margin-left: 12px">Confirmez votre voyage</b>
       </div>
     </div>
@@ -16,9 +16,10 @@
         map-type-id="terrain"
         style="width: 100%; height: 100%;"
       ></gmap-map>
-      <div class="confirm-trip-card">
-        <h3>20km - 6000L.L - 10 minutes</h3>
-        <button class="btn btn-primary btn-block">Confirmer</button>
+      <div class="confirm-trip-card" v-if="directionsData">
+        <h3>{{directionsData.distance.text}} - 6000L.L - {{directionsData.duration.text}}</h3>
+        <button @click="$router.push('/choose-driver')"
+        class="btn btn-primary btn-block">Confirmer</button>
       </div>
     </div>
   </div>
@@ -28,18 +29,38 @@
 import { mapState } from "vuex";
 export default {
   data() {
-    return {};
+    return {
+      directionsData: null
+    };
+  },
+  created() {
   },
   mounted() {
-    
-    this.drawRouteAsync(this.$refs.map, this.start, this.destination);
+    this.$store.dispatch("setDirectionsData", null);
+    this.drawRouteAsync(this.$refs.map, this.start, this.destination)
+    .then((directionsResult) => {
+      const leg = directionsResult.routes[0].legs[0]; // contains the directions data + other stuff
+      const directionsData = {};
+      directionsData.distance = leg.distance;
+      directionsData.duration = leg.duration;
+      directionsData.steps = leg.steps;
+      this.directionsData = directionsData;
+      //this.$store.dispatch("setDirectionsData", directionsData);
+    });
+     
   },
   methods: {},
+  watch: {
+    directionsData() {
+      alert("YESSS!!");
+    }
+  },
   computed: {
     ...mapState({
       mapCenter: state => state.mapStore.mapCenter,
       start: state => state.mapStore.start,
-      destination: state => state.mapStore.destination
+      destination: state => state.mapStore.destination,
+  //    directionsData: state => state.mapStore.directionsData
     })
   }  
 };

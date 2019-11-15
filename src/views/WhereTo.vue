@@ -45,15 +45,14 @@ export default {
   },
   methods: {},
   created() {
+    this.$store.dispatch("setMapCenter", {lat: 0, lng: 0});
     this.getCurrentLocationAsync().then(pos => {
-      console.log(pos);
       this.$store.dispatch("setMapCenter", pos);
       this.currentPosition = pos;
     });
   },
   watch: {
     mapCenter() {
-      console.log(this.mapCenter);
     }
   },
   computed: {

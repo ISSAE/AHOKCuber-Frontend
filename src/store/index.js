@@ -6,7 +6,8 @@ const debug = process.env.NODE_ENV !== 'production'
 
 Vue.use(Vuex);
 const vuexLocal = new VuexPersistence({
-  storage: window.localStorage
+  storage: window.localStorage,
+  supportCircular: true
 })
 export default new Vuex.Store({
   modules: {
