@@ -52,7 +52,6 @@ export default {
   methods: {},
   watch: {
     directionsData() {
-      alert("YESSS!!");
     }
   },
   computed: {

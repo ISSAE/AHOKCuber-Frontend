@@ -40,4 +40,4 @@ new Vue({
   render: h => h(App)
 }).$mount('#app')
 
-router.push("/where-to")
+router.push("/trip-request")

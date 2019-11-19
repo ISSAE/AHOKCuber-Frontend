@@ -11,6 +11,8 @@ import TripSearch from './views/TripSearch.vue'
 import ConfirmTrip from './views/ConfirmTrip.vue'
 import ChooseDriver from './views/ChooseDriver.vue'
 import DriverComing from './views/DriverComing.vue'
+import TripRequest from './views/TripRequest.vue'
+import Idle from './views/Idle.vue'
 
 Vue.use(Router)
 
@@ -71,6 +73,16 @@ export default new Router({
       name: 'driver-coming',
       component: DriverComing
     },
+    {
+      path: '/trip-request',
+      name: 'trip-request',
+      component: TripRequest
+    },
+    {
+      path: '/idle',
+      name: 'idle',
+      component: Idle
+    },          
     {
       path: '/about',
       name: 'about',

@@ -6,7 +6,8 @@ const state = {
     start: null,
     destination: null,
     directionsData: null,
-    driver: null
+    driver: null,
+    tripRequest: null // trip request as received by the driver
 }
 
 const getters = {
@@ -38,6 +39,9 @@ const actions = {
     },
     setDriver({ commit }, driver) {
         commit('SET_DRIVER', driver);
+    },
+    setTripRequest({ commit }, tripRequest) {
+        commit('SET_TRIP_REQUEST', tripRequest);
     }
 }
 
@@ -63,6 +67,9 @@ const mutations = {
     },
     'SET_DRIVER'(state, driver) {
         state.driver = driver;
+    },
+    'SET_TRIP_REQUEST'(state, tripRequest) {
+        state.tripRequest = tripRequest;
     }
 }
 

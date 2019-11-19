@@ -14,7 +14,7 @@
  */
 export function registerDriverAsync(payload) {
     return new Promise((resolve, reject) => {
-        resolve({body: {status: "success"}});
+        resolve({ body: { status: "success" } });
     });
     // TODO registration endpoint
 }
@@ -31,7 +31,7 @@ export function registerDriverAsync(payload) {
  */
 export function registerClientAsync(payload) {
     return new Promise((resolve, reject) => {
-        resolve({body: {status: "success"}});
+        resolve({ body: { status: "success" } });
     });
     // TODO registration endpoint
 }
@@ -51,14 +51,18 @@ export function loginAsync(payload) {
  */
 export function getAuthenticatedClientAsync() {
     return new Promise((resolve, reject) => {
-        resolve({body: {status: "success", client: {
-            gender: "male",
-            first_name: "Adnan",
-            last_name: "Hamzeh",
-            username: "adnan_hamzeh",
-            password: "password",
-            phone_number: "01390390019",
-        }}});
+        resolve({
+            body: {
+                status: "success", client: {
+                    gender: "male",
+                    first_name: "Adnan",
+                    last_name: "Hamzeh",
+                    username: "adnan_hamzeh",
+                    password: "password",
+                    phone_number: "01390390019",
+                }
+            }
+        });
     });
     // TODO get authenticated user endpoint
 }
@@ -68,16 +72,20 @@ export function getAuthenticatedClientAsync() {
  */
 export function getAuthenticatedDriverAsync() {
     return new Promise((resolve, reject) => {
-        resolve({body: {status: "success", driver: {
-            gender: "male",
-            first_name: "Adnan",
-            last_name: "Hamzeh",
-            username: "adnan_hamzeh",
-            password: "password",
-            phone_number: "01390390019",
-            car_model: "Renault Clio 2010",
-            car_registration_number:  "T 1029303"
-        }}});
+        resolve({
+            body: {
+                status: "success", driver: {
+                    gender: "male",
+                    first_name: "Adnan",
+                    last_name: "Hamzeh",
+                    username: "adnan_hamzeh",
+                    password: "password",
+                    phone_number: "01390390019",
+                    car_model: "Renault Clio 2010",
+                    car_registration_number: "T 1029303"
+                }
+            }
+        });
     });
     // TODO get authenticated user endpoint
 }
@@ -94,8 +102,8 @@ export function getAuthenticatedDriverAsync() {
  */
 export function updateClientProfileAsync(payload) {
     return new Promise((resolve, reject) => {
-        resolve({body: {status: "success"}});
-    });    
+        resolve({ body: { status: "success" } });
+    });
 }
 
 /**
@@ -112,8 +120,8 @@ export function updateClientProfileAsync(payload) {
  */
 export function updateDriverProfileAsync(payload) {
     return new Promise((resolve, reject) => {
-        resolve({body: {status: "success"}});
-    });    
+        resolve({ body: { status: "success" } });
+    });
 }
 /**
  * Requests a list of candidate drivers for a start and end geolocation points
@@ -126,7 +134,7 @@ export function updateDriverProfileAsync(payload) {
  * @param {double} payload.end.lat - the end location latitude 
  */
 export function getCandidateDriversAsync(payload) {
-    const driversExampleResponse = {drivers: []};
+    const driversExampleResponse = { drivers: [] };
     driversExampleResponse.drivers.push({
         id: 1,
         gender: "male",
@@ -146,10 +154,13 @@ export function getCandidateDriversAsync(payload) {
         rating: 4
     });
     return new Promise((resolve, reject) => {
-        resolve({body: {status: "success",
-        drivers: driversExampleResponse.drivers
-        }});
-    });    
+        resolve({
+            body: {
+                status: "success",
+                drivers: driversExampleResponse.drivers
+            }
+        });
+    });
 }
 
 /**
@@ -160,8 +171,49 @@ export function getCandidateDriversAsync(payload) {
  */
 export function requestCandidateDriverApproval(driver) {
     return new Promise((resolve, reject) => {
-        resolve({body: {status: "success",
-        driverResponse: {accepted: true, driver: driver}
-        }});
-    });    
+        resolve({
+            body: {
+                status: "success",
+                driverResponse: { accepted: true, driver: driver }
+            }
+        });
+    });
+}
+
+/**
+ * Sends a driver's approval of a trip request
+ * @param {object} tripRequest - the trip request object
+ * @param {object} tripRequest.start - start coords of the trip request
+ * @param {double} tripRequest.start.lat - start latitude
+ * @param {double} tripRequest.start.lng - start longtitude
+ * @param {object} tripRequest.destination - same as start, but for the destination
+ * @param {object} tripRequest.client - the client requesting the trip
+ * @param {string} tripRequest.client.first_name - the first name of the client
+ * @param {string} tripRequest.client.last_name - the last name of the client  
+ */
+export function acceptTripRequestAsync(tripRequest) {
+    return new Promise((resolve, reject) => {
+        resolve({ body: { status: "success" } });
+    });
+}
+
+/**
+ * Sends a driver's disapproval of a trip request
+ * @param {object} tripRequest - the trip request object
+ * @param {object} tripRequest.start - start coords of the trip request
+ * @param {double} tripRequest.start.lat - start latitude
+ * @param {double} tripRequest.start.lng - start longtitude
+ * @param {object} tripRequest.destination - same as start, but for the destination
+ * @param {object} tripRequest.client - the client requesting the trip
+ * @param {string} tripRequest.client.first_name - the first name of the client
+ * @param {string} tripRequest.client.last_name - the last name of the client  
+ */
+export function declineTripRequestAsync(driver) {
+    return new Promise((resolve, reject) => {
+        resolve({
+            body: {
+                status: "success"
+            }
+        });
+    });
 }

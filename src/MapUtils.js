@@ -10,7 +10,9 @@ export default {
          */
         drawRouteAsync(mapRef) {
             return new Promise((resolve, reject) => {
-                if (!this.directionsService || !this.directionsDisplay || !this.start || !this.destination) {
+                var directionsDisplaySet = Object.keys(this.directionsDisplay).length === 0;
+                var directionsServiceSet = Object.keys(this.directionsService).length === 0;
+                if (!directionsDisplaySet || !directionsServiceSet || !this.start || !this.destination) {
                     reject({
                         directionsService: this.directionsService,
                         directionsDisplay: this.directionsDisplay,
@@ -70,6 +72,9 @@ export default {
          */
         getPlaceCoordinates(place) {
             return { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() }
+        },
+        getCoordinatesPlace(/*coords*/) {
+            return "Your House";
         }
     },
     computed: {
