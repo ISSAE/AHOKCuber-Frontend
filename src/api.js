@@ -1,39 +1,34 @@
 /* eslint-disable */
-
+import Vue from 'vue';
+import { API_URL } from '@/config.js';
 /**
  * Sends a driver registration request 
  * @param {object} payload - The driver data
- * @param {string} payload.username
+ * @param {string} payload.email
  * @param {string} payload.first_name
  * @param {string} payload.last_name
  * @param {string} payload.phone_number
  * @param {string} payload.password
- * @param {string} payload.gender - Either "male" or "female"
+ * @param {string} payload.gender - Either "MALE" or "FEMALE"
  * @param {string} payload.car_model - driver car model
  * @param {string} payload.car_registration_number - driver car registration number
  */
 export function registerDriverAsync(payload) {
-    return new Promise((resolve, reject) => {
-        resolve({ body: { status: "success" } });
-    });
-    // TODO registration endpoint
+    return Vue.http.post(API_URL + "auth/driver/register", payload)
 }
 
 /**
  * Sends a client registration request 
  * @param {object} payload - The driver data
- * @param {string} payload.username
+ * @param {string} payload.email
  * @param {string} payload.first_name
  * @param {string} payload.last_name
  * @param {string} payload.phone_number
  * @param {string} payload.password
- * @param {string} payload.gender - Either "male" or "female"
+ * @param {string} payload.gender - Either "MALE" or "FEMALE"
  */
 export function registerClientAsync(payload) {
-    return new Promise((resolve, reject) => {
-        resolve({ body: { status: "success" } });
-    });
-    // TODO registration endpoint
+    return Vue.http.post(API_URL + "auth/client/register", payload)
 }
 
 /**
@@ -43,13 +38,14 @@ export function registerClientAsync(payload) {
  * @param {string} payload.password
  */
 export function loginAsync(payload) {
-    // TODO login endpoint
+    return Vue.http.post(API_URL + "auth/token", payload)
 }
 
 /**
  * Get authenticated client
  */
 export function getAuthenticatedClientAsync() {
+    Vue.http.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem("access_token");
     return new Promise((resolve, reject) => {
         resolve({
             body: {
@@ -57,7 +53,7 @@ export function getAuthenticatedClientAsync() {
                     gender: "male",
                     first_name: "Adnan",
                     last_name: "Hamzeh",
-                    username: "adnan_hamzeh",
+                    email: "adnan_hamzeh",
                     password: "password",
                     phone_number: "01390390019",
                 }
@@ -71,6 +67,7 @@ export function getAuthenticatedClientAsync() {
  * Get authenticated client
  */
 export function getAuthenticatedDriverAsync() {
+    Vue.http.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem("access_token");
     return new Promise((resolve, reject) => {
         resolve({
             body: {
@@ -78,7 +75,7 @@ export function getAuthenticatedDriverAsync() {
                     gender: "male",
                     first_name: "Adnan",
                     last_name: "Hamzeh",
-                    username: "adnan_hamzeh",
+                    email: "adnan_hamzeh",
                     password: "password",
                     phone_number: "01390390019",
                     car_model: "Renault Clio 2010",
@@ -93,7 +90,7 @@ export function getAuthenticatedDriverAsync() {
 /**
  * 
  * @param {object} payload - client data
- * @param {string} payload.username - username
+ * @param {string} payload.email - email
  * @param {string} payload.password - client password
  * @param {string} payload.first_name - client first name
  * @param {string} payload.last_name - client last name
@@ -101,6 +98,7 @@ export function getAuthenticatedDriverAsync() {
  * @param {string} payload.phone_number - client phone number 
  */
 export function updateClientProfileAsync(payload) {
+    Vue.http.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem("access_token");
     return new Promise((resolve, reject) => {
         resolve({ body: { status: "success" } });
     });
@@ -109,7 +107,7 @@ export function updateClientProfileAsync(payload) {
 /**
  * 
  * @param {object} payload - driver data
- * @param {string} payload.username - username
+ * @param {string} payload.email - email
  * @param {string} payload.password - driver password
  * @param {string} payload.first_name - driver first name
  * @param {string} payload.last_name - driver last name
@@ -119,6 +117,7 @@ export function updateClientProfileAsync(payload) {
  * @param {string} payload.car_registration_number - driver car registration number 
  */
 export function updateDriverProfileAsync(payload) {
+    Vue.http.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem("access_token");
     return new Promise((resolve, reject) => {
         resolve({ body: { status: "success" } });
     });
@@ -134,6 +133,7 @@ export function updateDriverProfileAsync(payload) {
  * @param {double} payload.end.lat - the end location latitude 
  */
 export function getCandidateDriversAsync(payload) {
+    Vue.http.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem("access_token");
     const driversExampleResponse = { drivers: [] };
     driversExampleResponse.drivers.push({
         id: 1,
@@ -170,6 +170,7 @@ export function getCandidateDriversAsync(payload) {
  * @param {integer} driver.id - the driver's ID 
  */
 export function requestCandidateDriverApproval(driver) {
+    Vue.http.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem("access_token");
     return new Promise((resolve, reject) => {
         resolve({
             body: {
@@ -192,6 +193,7 @@ export function requestCandidateDriverApproval(driver) {
  * @param {string} tripRequest.client.last_name - the last name of the client  
  */
 export function acceptTripRequestAsync(tripRequest) {
+    Vue.http.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem("access_token");
     return new Promise((resolve, reject) => {
         resolve({ body: { status: "success" } });
     });
@@ -209,6 +211,7 @@ export function acceptTripRequestAsync(tripRequest) {
  * @param {string} tripRequest.client.last_name - the last name of the client  
  */
 export function declineTripRequestAsync(driver) {
+    Vue.http.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem("access_token");
     return new Promise((resolve, reject) => {
         resolve({
             body: {
@@ -217,3 +220,44 @@ export function declineTripRequestAsync(driver) {
         });
     });
 }
+
+/**
+ * Updates a trip
+ * @param {object} trip - The trip object to update 
+ * @param {integer} trip.id - The ID of the trip to update
+ * @param {distance} [trip.distance] - In kilometers
+ * @param {date} [started_at] - UTC time when the trip started
+ * @param {date} [ended_at] - UTC time when the trip ended
+ * @param {object} [start_location] - start location coords lat,lng
+ * @param {object} [end_location] - end location coords lat,lng
+ * @param {string} [start_location_search_term] - start location search term
+ * @param {string} [end_location_search_term] - end location saerch term
+ * @param {string} [status] - the trip status, one of: client_waiting, client_picked_up, could_not_meet, finished
+ */
+export function updateTripAsync(trip) {
+    Vue.http.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem("access_token");
+    return new Promise((resolve, reject) => {
+        resolve({
+            body: {
+                status: "success"
+            }
+        });
+    });    
+}
+
+/**
+ * Gets a trip
+ * @param {integer} id - The ID of the trip to get 
+ */
+export function getTripAsync(id) {
+    Vue.http.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem("access_token");
+    return new Promise((resolve, reject) => {
+        resolve({
+            body: {
+                trip: {id: id, status: "client_waiting"}
+            }
+        });
+    });    
+}
+
+
