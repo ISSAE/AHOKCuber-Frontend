@@ -27,8 +27,7 @@
 
 <script>
 import { mapState } from "vuex";
-import { getCandidateDriversAsync, requestCandidateDriverApproval } from "../api.js";
-import {parse, stringify} from 'flatted/esm';
+import socket from "@/socket.js";
 export default {
   data() {
     return {
@@ -40,29 +39,38 @@ export default {
   created() {
   },
   mounted() {
-    this.drawRouteAsync(this.$refs.map, this.start, this.destination)
-    .then((directionsResult) => {
-      const leg = directionsResult.routes[0].legs[0]; // contains the directions data + other stuff
-      const directionsData = {};
-      directionsData.distance = leg.distance;
-      directionsData.duration = leg.duration;
-      directionsData.steps = leg.steps;
-      this.directionsData = directionsData;
-      
-      getCandidateDriversAsync({start: this.start, end: this.destination})
-      .then(({body}) => {
-        this.candidateDrivers = body.drivers;
-      })
-    });
+    socket.emit('request_location');
+    console.log("emit success");
+          socket.on('receive_location', (data) => {
+        console.log("Received location from driver");
+        let driver = data.driver;
+        if(this.candidateDrivers.filter(d => d.first_name == driver.first_name)  == 0) {
+          this.candidateDrivers.push(driver);
+        }
+      });
+    // this.drawRouteAsync(this.$refs.map, this.start, this.destination)
+    // .then((directionsResult) => {
+    //   const leg = directionsResult.routes[0].legs[0]; // contains the directions data + other stuff
+    //   const directionsData = {};
+    //   directionsData.distance = leg.distance;
+    //   directionsData.duration = leg.duration;
+    //   directionsData.steps = leg.steps;
+    //   this.directionsData = directionsData;
+    // });
      
   },
   methods: {
     confirmCandidateDriver() {
-      requestCandidateDriverApproval(this.currentCandidateDriver)
-      .then(({body}) => {
-        this.hasDriverAccepted = body.driverResponse.accepted;
-        this.$store.dispatch("setDriver", body.driverResponse.driver);
+      let driverId = this.candidateDrivers[this.currentCandidateDriverIndex].id;
+      socket.emit('request_trip', {clientLocation: JSON.stringify(this.start), driver: driverId});
+      socket.on('trip_accepted', (data) => {
+        let driver = data.driver;
+        alert(driver.first_name + " accepted your trip request");
         this.$router.push("/driver-coming");
+      });
+      socket.on('trip_declined', (data) => {
+        let driver = data.driver;
+        alert(driver.first_name + " declined your trip request");
       });
     },
     nextCandidateDriver() {
@@ -71,7 +79,8 @@ export default {
       if(driversCount <= this.currentCandidateDriverIndex) {
         this.currentCandidateDriverIndex = 0;
       }
-    }
+    },
+    
   },
   watch: {
   },

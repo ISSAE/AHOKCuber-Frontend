@@ -9,6 +9,7 @@
       </div>
     </div>
     <div class="body">
+      <div ref="directionsPanel" style="height: 220px; overflow-y: auto;"></div>
       <gmap-map
       ref="map"
         :center="{lat: 0, lng: 0}"
@@ -37,7 +38,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch("setDirectionsData", null);
-    this.drawRouteAsync(this.$refs.map, this.start, this.destination)
+    this.drawRouteAsync(this.$refs.map, this.$refs.directionsPanel)
     .then((directionsResult) => {
       const leg = directionsResult.routes[0].legs[0]; // contains the directions data + other stuff
       const directionsData = {};

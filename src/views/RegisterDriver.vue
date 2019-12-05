@@ -12,7 +12,7 @@
       </div>
 
       <div style="width: 100%">
-        <input v-model="username" class="form-control mb-3" type="text" placeholder="username" />
+        <input v-model="email" class="form-control mb-3" type="text" placeholder="Email" />
         <input v-model="password" class="form-control mb-3" type="text" placeholder="Mot de passe" />
         <input v-model="first_name" class="form-control mb-3" type="text" placeholder="Prénom" />
         <input v-model="last_name" class="form-control mb-3" type="text" placeholder="Nom" />
@@ -23,10 +23,10 @@
           placeholder="Numéro de téléphone"
         />
         <label for="homme" class="mr-3">
-          <input v-model="gender" value="male" id="homme" name="gender" type="radio" class="mb-3" /> Homme
+          <input v-model="gender" value="MALE" id="homme" name="gender" type="radio" class="mb-3" /> Homme
         </label>
         <label for="femme" class="ml-3">
-          <input v-model="gender" value="female" id="femme" name="gender" type="radio" class="mb-3" /> Femme
+          <input v-model="gender" value="FEMALE" id="femme" name="gender" type="radio" class="mb-3" /> Femme
         </label>
         <input
           v-model="car_model"
@@ -51,7 +51,7 @@ import { registerDriverAsync } from "@/api";
 export default {
   data() {
     return {
-      username: "",
+      email: "",
       first_name: "",
       last_name: "",
       phone_number: "",
@@ -68,7 +68,7 @@ export default {
         this.last_name &&
         this.phone_number &&
         this.password &&
-        this.username &&
+        this.email &&
         this.car_model &&
         this.car_registration_number
       );
@@ -76,7 +76,7 @@ export default {
     register() {
       if (this.areInputsFilled()) {
         const payload = {};
-        payload.username = this.username;
+        payload.email = this.email;
         payload.first_name = this.first_name;
         payload.last_name = this.last_name;
         payload.phone_number = this.phone_number;
@@ -86,7 +86,7 @@ export default {
         payload.car_registration_number = this.car_registration_number;
         registerDriverAsync(payload).then(
           response => {
-            if (response.body.status === "success") {
+            if (response.body.success) {
               alert(
                 "Compte créé avec succès ! Vous pouvez désormais vous connecter."
               );

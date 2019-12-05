@@ -23,7 +23,7 @@
 
 <script>
 import { mapState } from "vuex";
-import { EventBus } from '@/event-bus.js';
+import socket from '@/socket.js';
 export default {
   data() {
     return {
@@ -32,30 +32,28 @@ export default {
   },
   methods: {},
   created() {
+    socket.on('request_location', function(user){
+      console.log("Received request_location");
+      var jsonObject = {user: user, location: "{lat: 575, lng: 895}"};
+      socket.emit('get_location', jsonObject);
+    });
+    socket.on('request_trip', (data) => {
+      let clientLocation = data.location;
+      let client = data.client;
+      alert(client.first_name + " requested a trip");
+      this.getCurrentLocationAsync().then(pos => {
+        this.$store.dispatch("setStart", pos);
+        this.$store.dispatch("setDestination", JSON.parse(clientLocation));
+        this.$router.push("/directions");
+      });
+      socket.emit('trip_accepted', client.id);
+    });
     this.$store.dispatch("initDirectionServices");
-    this.$store.dispatch("setMapCenter", {lat: 0, lng: 0});
     this.getCurrentLocationAsync().then(pos => {
+      console.log(pos);
       this.$store.dispatch("setMapCenter", pos);
       this.currentPosition = pos;
     });
-    EventBus.$on("tripRequest", tripRequest => {
-      this.$store.dispatch("setTripRequest", tripRequest);
-      this.$router.push("/trip-request");
-    });
-    //demo code start
-    var start = this.start;
-    var destination = this.destination;
-    var tripRequest = {
-      start,
-      destination,
-      distance: "20km",
-      price: "6000L.L",
-      duration: "30 minutes"
-    };
-    setTimeout(() => {
-      EventBus.$emit("tripRequest", tripRequest);
-    }, 4000);    
-    //demo code end
   },
   watch: {
     mapCenter() {

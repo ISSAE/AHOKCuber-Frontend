@@ -28,7 +28,8 @@
         style="width: 100%; height: 100%;"
         ref="map"
       >
-        <gmap-marker :position="center = currentPosition" :clickable="false" :draggable="false"></gmap-marker>
+        <gmap-marker :position="center = currentPosition" :clickable="false" :draggable="false"
+            :icon="currentPositionMarkerIcon"></gmap-marker>
         <gmap-circle :center="mapCenter"></gmap-circle>
       </gmap-map>
     </div>
@@ -37,6 +38,7 @@
 
 <script>
 import { mapState } from "vuex";
+import CurrentPositionImg from "@/assets/images/current_position.png";
 export default {
   data() {
     return {
@@ -56,6 +58,12 @@ export default {
     }
   },
   computed: {
+    currentPositionMarkerIcon() {
+      return {
+        url: CurrentPositionImg,
+        size: {width: 20, height: 20}
+      };
+    },
     ...mapState({
       mapCenter: state => state.mapStore.mapCenter
     })

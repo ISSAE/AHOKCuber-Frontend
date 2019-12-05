@@ -25,18 +25,32 @@
 
 <script>
 import { mapState } from "vuex";
+import socket from "@/socket.js";
 export default {
   data() {
     return {
+      currentDriverLocation: null
     };
   },
   created() {
   },
   mounted() {
     this.drawRouteAsync(this.$refs.map, this.start, this.destination);
+    socket.on("receive_location", (data) => {
+      // let driver = data.driver;
+      this.currentDriverLocation = data.location;
+    });
      
   },
   methods: {
+    setDriverArrived() {
+      socket.emit("driver_arrived");
+      this.$router.push("/directions");
+    },
+    setCouldNotMeet() {
+      socket.emit("could_not_meet");
+      this.$router.push("/where-to");
+    }
   },
   watch: {
   },

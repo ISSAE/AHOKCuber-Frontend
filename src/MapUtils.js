@@ -8,7 +8,7 @@ export default {
          * Resolves with a DirectionsResult object
          * @param {object} mapRef - ref to map component
          */
-        drawRouteAsync(mapRef) {
+        drawRouteAsync(mapRef, directionsPanelRef) {
             return new Promise((resolve, reject) => {
                 var directionsDisplaySet = Object.keys(this.directionsDisplay).length === 0;
                 var directionsServiceSet = Object.keys(this.directionsService).length === 0;
@@ -37,6 +37,9 @@ export default {
                                 (response, status) => {
                                     if (status === "OK") {
                                         this.directionsDisplay.setDirections(response);
+                                        if(directionsPanelRef) {
+                                            this.directionsDisplay.setPanel(directionsPanelRef);
+                                        }
                                         resolve(response);
                                     } else {
                                         reject(status);

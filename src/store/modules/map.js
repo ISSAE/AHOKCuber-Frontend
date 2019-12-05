@@ -1,3 +1,4 @@
+import waitForGlobal from '@/global-wait';
 
 const state = {
     mapCenter: null,
@@ -49,9 +50,10 @@ const actions = {
 const mutations = {
 
     'INIT_DIRECTION_SERVICES'(state) {
-        state.directionsDisplay = new window.google.maps.DirectionsRenderer();
-        state.directionsService = new window.google.maps.DirectionsService();
-
+        waitForGlobal("google", () => {
+            state.directionsDisplay = new window.google.maps.DirectionsRenderer();
+            state.directionsService = new window.google.maps.DirectionsService();
+        })
     },
     'SET_START'(state, coords) { // {lat, lng}
         state.start = coords;
