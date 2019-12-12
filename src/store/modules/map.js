@@ -1,14 +1,12 @@
-import waitForGlobal from '@/global-wait';
+
 
 const state = {
     mapCenter: null,
-    directionsDisplay: null,
-    directionsService: null,
     start: null,
     destination: null,
     directionsData: null,
     driver: null,
-    tripRequest: null // trip request as received by the driver
+    tripRequest: null, // trip request as received by the driver
 }
 
 const getters = {
@@ -19,9 +17,6 @@ const getters = {
 
 // actions
 const actions = {
-    initDirectionServices({ commit }) {
-        commit('INIT_DIRECTION_SERVICES')
-    },
     setMapCenter({ commit }, { lat, lng }) {
         commit('SET_MAP_CENTER', { lat, lng })
     },
@@ -48,13 +43,6 @@ const actions = {
 
 // mutations
 const mutations = {
-
-    'INIT_DIRECTION_SERVICES'(state) {
-        waitForGlobal("google", () => {
-            state.directionsDisplay = new window.google.maps.DirectionsRenderer();
-            state.directionsService = new window.google.maps.DirectionsService();
-        })
-    },
     'SET_START'(state, coords) { // {lat, lng}
         state.start = coords;
     },

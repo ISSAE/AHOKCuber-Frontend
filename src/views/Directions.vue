@@ -9,20 +9,25 @@
       </div>
     </div>
     <div class="body">
+      <div ref="directionsPanel" style="height: 220px; overflow-y: auto;"></div>
       <gmap-map
       ref="map"
         :center="mapCenter"
         :zoom="12"
         map-type-id="terrain"
         style="width: 100%; height: 100%;"
-      ></gmap-map>
+      >
+      <gmap-marker :position="currentDriverLocation" :clickable="false" :draggable="false"
+        :icon="driverPositionMarkerIcon"></gmap-marker>
+      </gmap-map>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
-import socket from "@/socket.js";
+import {socket} from "@/socket.js";
+import DriverPositionImg from '@/assets/images/driver_icon.png';
 export default {
   data() {
     return {
@@ -33,10 +38,11 @@ export default {
     alert("Directions!");
   },
   mounted() {
-    this.drawRouteAsync(this.$refs.map, this.start, this.destination);
+    this.drawRouteAsync(this.$refs.map, this.$refs.directionsPanel);
     setInterval(() => {
       this.getCurrentLocationAsync().then((pos) => {
-        console.log(pos);
+        console.log("driver location");
+        this.currentDriverLocation = pos;
       });
     }, 1000);
 
@@ -53,6 +59,12 @@ export default {
   watch: {
   },
   computed: {
+    driverPositionMarkerIcon() {
+      return {
+        url: DriverPositionImg,
+        size: {width: 20, height: 20}
+      };
+    },     
     ...mapState({
       mapCenter: state => state.mapStore.mapCenter,
       start: state => state.mapStore.start,

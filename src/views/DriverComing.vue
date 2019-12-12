@@ -15,9 +15,26 @@
         :zoom="7"
         map-type-id="terrain"
         style="width: 100%; height: 100%;"
-      ></gmap-map>
-      <div class="driver-coming-card" v-if="driver">
+      >
+        <gmap-marker :position="currentDriverLocation" :clickable="false" :draggable="false"
+        :icon="driverPositionMarkerIcon"></gmap-marker>
+      </gmap-map>
+      <div class="driver-coming-card" v-if="driver && arrivalTimeoutSeconds > 0">
         <h3>{{driver.first_name}} - {{driver.car_model}}</h3>
+        <h4>{{distanceFromDriver}}</h4>
+        <div class="row">
+          <div class="col-4">
+            <button class="btn btn-block btn-primary" @click="setDriverArrived">OK!</button>
+          </div>
+          <div class="col-4">
+            <button class="btn btn-block btn-secondary"><i class="fa fa-phone"></i> Appeler</button>
+          </div> 
+          <div class="col-4"><button class="btn btn-block btn-default">{{arrivalTimeoutSeconds}} sec.</button></div>        
+        </div>
+      </div>
+      <div class="driver-coming-card"  v-else>
+        <h4>La rencontre a échoué</h4>
+        <button class="btn btn-block btn-primary" @click="$router.push('/where-to')">Retourner</button>
       </div>
     </div>
   </div>
@@ -25,20 +42,39 @@
 
 <script>
 import { mapState } from "vuex";
-import socket from "@/socket.js";
+import {socket} from "@/socket.js";
+import CurrentPositionImg from "@/assets/images/current_position.png";
+import DriverPositionImg from '@/assets/images/driver_icon.png';
 export default {
   data() {
     return {
-      currentDriverLocation: null
+      currentDriverLocation: {lat: 0, lng: 0},
+      distanceFromDriver: null,
+      arrivalTimeoutSeconds: 10
     };
   },
   created() {
+    setInterval(() => {
+      var driverDistanceKm = parseInt(this.getDistanceInKm(this.currentDriverLocation, this.start));
+      if(driverDistanceKm <= 1) {
+        this.arrivalTimeoutSeconds--;
+      }
+      
+    }, 1000);
   },
   mounted() {
-    this.drawRouteAsync(this.$refs.map, this.start, this.destination);
+    this.drawRouteAsync(this.$refs.map);
     socket.on("receive_location", (data) => {
-      // let driver = data.driver;
-      this.currentDriverLocation = data.location;
+      console.log(data);
+      this.$store.dispatch("setDriver", data.driver);
+      this.currentDriverLocation = JSON.parse(data.location);
+      var driverDistanceKm = parseInt(this.getDistanceInKm(this.currentDriverLocation, this.start));
+      if(driverDistanceKm <= 1) {
+        this.distanceFromDriver = "Votre conducteur est arrivé";
+      } else {
+        this.distanceFromDriver = "Votre conducteur est à " + driverDistanceKm + " kilomètres";
+      }
+      
     });
      
   },
@@ -55,6 +91,12 @@ export default {
   watch: {
   },
   computed: {
+    driverPositionMarkerIcon() {
+      return {
+        url: DriverPositionImg,
+        size: {width: 20, height: 20}
+      };
+    },    
     ...mapState({
       mapCenter: state => state.mapStore.mapCenter,
       start: state => state.mapStore.start,

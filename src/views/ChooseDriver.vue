@@ -27,7 +27,7 @@
 
 <script>
 import { mapState } from "vuex";
-import socket from "@/socket.js";
+import {socket} from "@/socket.js";
 export default {
   data() {
     return {
@@ -41,29 +41,32 @@ export default {
   mounted() {
     socket.emit('request_location');
     console.log("emit success");
-          socket.on('receive_location', (data) => {
+      socket.on('receive_location', (data) => {
         console.log("Received location from driver");
         let driver = data.driver;
         if(this.candidateDrivers.filter(d => d.first_name == driver.first_name)  == 0) {
           this.candidateDrivers.push(driver);
         }
       });
-    // this.drawRouteAsync(this.$refs.map, this.start, this.destination)
-    // .then((directionsResult) => {
-    //   const leg = directionsResult.routes[0].legs[0]; // contains the directions data + other stuff
-    //   const directionsData = {};
-    //   directionsData.distance = leg.distance;
-    //   directionsData.duration = leg.duration;
-    //   directionsData.steps = leg.steps;
-    //   this.directionsData = directionsData;
-    // });
+      this.drawRouteAsync(this.$refs.map)
+      .then((directionsResult) => {
+        const leg = directionsResult.routes[0].legs[0]; // contains the directions data + other stuff
+        const directionsData = {};
+        directionsData.distance = leg.distance;
+        directionsData.duration = leg.duration;
+        directionsData.steps = leg.steps;
+        this.directionsData = directionsData;
+      });
      
   },
   methods: {
     confirmCandidateDriver() {
       let driverId = this.candidateDrivers[this.currentCandidateDriverIndex].id;
-      socket.emit('request_trip', {clientLocation: JSON.stringify(this.start), driver: driverId});
+      let trip = {start: this.start, destination: this.destination};
+      socket.emit('request_trip', {clientLocation: JSON.stringify(this.start),
+                                   clientDestination: JSON.stringify(this.destination), driver: driverId});
       socket.on('trip_accepted', (data) => {
+        alert("Trip accepted!");
         let driver = data.driver;
         alert(driver.first_name + " accepted your trip request");
         this.$router.push("/driver-coming");

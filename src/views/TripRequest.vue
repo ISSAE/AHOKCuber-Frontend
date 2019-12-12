@@ -16,9 +16,10 @@
         map-type-id="terrain"
         style="width: 100%; height: 100%;"
       ></gmap-map>
-      <div class="trip-request-card" v-if="tripRequest">
-        <h3>{{tripRequest.start}} - {{tripRequest.destination}}</h3>
-        <h4>{{tripRequest.distance}} - {{tripRequest.price}} - {{tripRequest.duration}}</h4>
+      <div class="trip-request-card" v-if="tripRequest && directionsData">
+        <h6>De: {{tripRequest.start}}</h6>
+        <h6>À: {{tripRequest.destination}}</h6>
+        <h4>{{directionsData.distance.text}} - {{tripRequest.price}} - {{directionsData.duration.text}}</h4>
         <button @click="acceptRequest" class="btn btn-primary btn-block">Accepter</button>
         <button @click="declineRequest" class="btn btn-default btn-block">Refuser</button>
       </div>
@@ -29,17 +30,44 @@
 <script>
 import { mapState } from "vuex";
 // import { EventBus } from "@/event-bus.js";
+import {socket} from "@/socket.js";
 export default {
   data() {
-    return {};
+    return {
+      directionsData: null
+    };
   },
   created() {
-    this.$store.dispatch("initDirectionServices");
   },
   mounted() {
-    this.drawRouteAsync(this.$refs.map);
+    this.drawRouteAsync(this.$refs.map)
+    .then((directionsResult) => {
+        const leg = directionsResult.routes[0].legs[0]; // contains the directions data + other stuff
+        const directionsData = {};
+        directionsData.distance = leg.distance;
+        directionsData.duration = leg.duration;
+        directionsData.steps = leg.steps;
+        this.directionsData = directionsData;
+        //this.$store.dispatch("setDirectionsData", directionsData);
+    });
   },
   methods: {
+    acceptRequest() {
+      alert("acceptRequest");
+      this.getCurrentLocationAsync()
+      .then(pos => { 
+        console.log(this.start);  
+        this.$store.dispatch("setDestination", {lat: this.start.lat, lng: this.start.lng});
+        this.$store.dispatch("setStart", {lat: pos.lat, lng: pos.lng});
+        socket.emit('trip_accepted', this.tripRequest.client.id);
+        this.$router.push("/directions");
+        
+      }) 
+      
+    },
+    declineRequest() {
+      this.$router.push("/idle");
+    }
   },
   watch: {
     tripRequest() {

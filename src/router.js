@@ -13,6 +13,7 @@ import ChooseDriver from './views/ChooseDriver.vue'
 import DriverComing from './views/DriverComing.vue'
 import TripRequest from './views/TripRequest.vue'
 import Idle from './views/Idle.vue'
+import Directions from './views/Directions.vue'
 
 Vue.use(Router)
 
@@ -82,6 +83,11 @@ export default new Router({
       path: '/idle',
       name: 'idle',
       component: Idle
+    },     
+    {
+      path: '/directions',
+      name: 'directions',
+      component: Directions
     },          
     {
       path: '/about',

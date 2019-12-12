@@ -3,7 +3,12 @@
     <div class="body">
       <div class="map-overlay">
         <div class="top">
-          <h2>Bonjour Adnan!</h2>
+          <div class="history">
+            <i class="fa fa-history"></i>
+          </div>
+          <div class="profile">
+            <i class="fa fa-user"></i>
+          </div>
         </div>
       </div>
 
@@ -14,8 +19,8 @@
         style="width: 100%; height: 100%;"
         ref="map"
       >
-        <gmap-marker :position="center = currentPosition" :clickable="false" :draggable="false"></gmap-marker>
-        <gmap-circle :center="mapCenter"></gmap-circle>
+        <gmap-marker :position="currentPosition" :clickable="false" :draggable="false"
+        :icon="driverPositionMarkerIcon"></gmap-marker>
       </gmap-map>
     </div>
   </div>
@@ -23,7 +28,8 @@
 
 <script>
 import { mapState } from "vuex";
-import socket from '@/socket.js';
+import { socket } from '@/socket.js';
+import DriverPositionImg from '@/assets/images/driver_icon.png';
 export default {
   data() {
     return {
@@ -32,34 +38,52 @@ export default {
   },
   methods: {},
   created() {
-    socket.on('request_location', function(user){
-      console.log("Received request_location");
-      var jsonObject = {user: user, location: "{lat: 575, lng: 895}"};
-      socket.emit('get_location', jsonObject);
+    this.$store.dispatch("setMapCenter", this.currentPosition);
+  },
+  mounted() {
+    socket.on('request_location', (user) => {
+      this.getCurrentLocationAsync().then(pos => {
+        var jsonObject = {user: user, location: JSON.stringify(pos)};
+        socket.emit('get_location', jsonObject);
+      });
     });
     socket.on('request_trip', (data) => {
+      console.log(data);
       let clientLocation = data.location;
+      let clientDestination = data.destination;
       let client = data.client;
       alert(client.first_name + " requested a trip");
-      this.getCurrentLocationAsync().then(pos => {
-        this.$store.dispatch("setStart", pos);
-        this.$store.dispatch("setDestination", JSON.parse(clientLocation));
-        this.$router.push("/directions");
+      this.getCoordinatesPlace(JSON.parse(clientLocation)).then(place => {
+          var tripStart = place;
+          var tripEnd = "";
+          this.getCoordinatesPlace(JSON.parse(clientDestination)).then(endPlace => {
+            tripEnd = endPlace;
+            let tripRequest = {start: tripStart, destination: tripEnd, client: client}; 
+            this.$store.dispatch("setTripRequest", tripRequest);
+            this.$store.dispatch("setMapCenter", JSON.parse(clientLocation));
+            this.$store.dispatch("setStart", JSON.parse(clientLocation));
+            this.$store.dispatch("setDestination", JSON.parse(clientDestination));
+            this.$router.push("/trip-request");
+          });
       });
-      socket.emit('trip_accepted', client.id);
     });
-    this.$store.dispatch("initDirectionServices");
+
     this.getCurrentLocationAsync().then(pos => {
-      console.log(pos);
       this.$store.dispatch("setMapCenter", pos);
       this.currentPosition = pos;
-    });
+    });    
   },
   watch: {
     mapCenter() {
     }
   },
   computed: {
+    driverPositionMarkerIcon() {
+      return {
+        url: DriverPositionImg,
+        size: {width: 20, height: 20}
+      };
+    },
     ...mapState({
       mapCenter: state => state.mapStore.mapCenter
     })

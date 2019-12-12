@@ -44,7 +44,6 @@ export default {
     return {};
   },
   created() {
-    this.$store.dispatch("initDirectionServices");
     this.$store.dispatch("setStart", null);
   },
   methods: {

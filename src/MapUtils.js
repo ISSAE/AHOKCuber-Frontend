@@ -1,7 +1,17 @@
 import { mapState } from "vuex";
+import waitForGlobal from '@/global-wait';
 export default {
     data() {
-        return {};
+        return {
+            directionsDisplay: null,
+            directionsService: null
+        };
+    },
+    created() {
+        waitForGlobal("google", () => {
+            this.directionsDisplay = new window.google.maps.DirectionsRenderer();
+            this.directionsService = new window.google.maps.DirectionsService();
+        })
     },
     methods: {
         /**
@@ -76,9 +86,27 @@ export default {
         getPlaceCoordinates(place) {
             return { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() }
         },
-        getCoordinatesPlace(/*coords*/) {
-            return "Your House";
-        }
+        getCoordinatesPlace(coords) {
+            var geocoder = new window.google.maps.Geocoder;
+            return new Promise((resolve, reject) => {
+                geocoder.geocode({"location": coords}, (results, status) => {
+                    if(status !== "OK") {
+                        reject();
+                    } else {
+                        resolve(results[0].formatted_address);
+                    }
+                });
+            });
+        },
+        getDistanceInKm(point1, point2) {
+            var p = 0.017453292519943295;    // Math.PI / 180
+            var c = Math.cos;
+            var a = 0.5 - c((point2.lat - point1.lat) * p)/2 + 
+                    c(point1.lat * p) * c(point2.lat * p) * 
+                    (1 - c((point2.lng - point1.lng) * p))/2;
+          
+            return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
+          }
     },
     computed: {
         autocompleteOptions() {
@@ -94,8 +122,6 @@ export default {
         },
         ...mapState({
             mapCenter: state => state.mapStore.mapCenter,
-            directionsDisplay: state => state.mapStore.directionsDisplay,
-            directionsService: state => state.mapStore.directionsService,
             start: state => state.mapStore.start,
             destination: state => state.mapStore.destination,
         }),

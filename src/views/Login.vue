@@ -23,6 +23,7 @@
 
 <script>
 import { loginDriverAsync, loginClientAsync } from "@/api.js";
+import {initSocket} from '@/socket';
 export default {
   data() {
     return {
@@ -38,13 +39,15 @@ export default {
           localStorage.setItem("user_type", "driver");
           localStorage.setItem("access_token", body.body.token);
           localStorage.setItem("user_profile", JSON.stringify(body.body.entity));
+          initSocket();
           alert("Connexion établie !");
           this.$router.push("/idle");
         } else {
           alert("Connexion échouée");
         }
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e);
         alert("Connexion échouée");
       });
     },
@@ -55,6 +58,7 @@ export default {
           localStorage.setItem("user_type", "client");
           localStorage.setItem("access_token", body.body.token);
           localStorage.setItem("user_profile", JSON.stringify(body.body.entity));
+          initSocket();
           alert("Connexion établie !");
           this.$router.push("/where-to");
         } else {
