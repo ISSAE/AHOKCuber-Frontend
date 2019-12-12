@@ -52,7 +52,6 @@ export default {
       let clientLocation = data.location;
       let clientDestination = data.destination;
       let client = data.client;
-      alert(client.first_name + " requested a trip");
       this.getCoordinatesPlace(JSON.parse(clientLocation)).then(place => {
           var tripStart = place;
           var tripEnd = "";

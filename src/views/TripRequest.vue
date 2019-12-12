@@ -53,7 +53,6 @@ export default {
   },
   methods: {
     acceptRequest() {
-      alert("acceptRequest");
       this.getCurrentLocationAsync()
       .then(pos => { 
         console.log(this.start);  

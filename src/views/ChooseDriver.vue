@@ -66,14 +66,11 @@ export default {
       socket.emit('request_trip', {clientLocation: JSON.stringify(this.start),
                                    clientDestination: JSON.stringify(this.destination), driver: driverId});
       socket.on('trip_accepted', (data) => {
-        alert("Trip accepted!");
         let driver = data.driver;
-        alert(driver.first_name + " accepted your trip request");
         this.$router.push("/driver-coming");
       });
       socket.on('trip_declined', (data) => {
         let driver = data.driver;
-        alert(driver.first_name + " declined your trip request");
       });
     },
     nextCandidateDriver() {

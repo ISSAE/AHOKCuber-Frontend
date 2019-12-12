@@ -35,7 +35,6 @@ export default {
     };
   },
   created() {
-    alert("Directions!");
   },
   mounted() {
     this.drawRouteAsync(this.$refs.map, this.$refs.directionsPanel);
