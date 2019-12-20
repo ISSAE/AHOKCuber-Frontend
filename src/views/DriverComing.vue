@@ -50,7 +50,8 @@ export default {
     return {
       currentDriverLocation: {lat: 0, lng: 0},
       distanceFromDriver: null,
-      arrivalTimeoutSeconds: 10
+      arrivalTimeoutSeconds: 10,
+      trip: null
     };
   },
   created() {
@@ -76,15 +77,20 @@ export default {
       }
       
     });
+
+    socket.on('trip_updated', (trip) => {
+      this.trip = trip;
+    });
      
   },
   methods: {
     setDriverArrived() {
-      socket.emit("driver_arrived");
+      socket.emit("driver_arrived", this.trip.id);
+      window.tripId = this.trip.id;
       this.$router.push("/directions");
     },
     setCouldNotMeet() {
-      socket.emit("could_not_meet");
+      socket.emit("could_not_meet", this.trip.id);
       this.$router.push("/where-to");
     }
   },

@@ -20,5 +20,7 @@ export function initSocket() {
         });
         console.log("DISCONNECTED FROM SOCKET");
     });
+
+    window.socket = socket;
     console.log("Socket init successful");
 }

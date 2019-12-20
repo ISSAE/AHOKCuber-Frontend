@@ -22,7 +22,7 @@ export default {
             return new Promise((resolve, reject) => {
                 var directionsDisplaySet = Object.keys(this.directionsDisplay).length === 0;
                 var directionsServiceSet = Object.keys(this.directionsService).length === 0;
-                if (!directionsDisplaySet || !directionsServiceSet || !this.start || !this.destination) {
+                if (false) {
                     reject({
                         directionsService: this.directionsService,
                         directionsDisplay: this.directionsDisplay,
@@ -46,6 +46,7 @@ export default {
                                 },
                                 (response, status) => {
                                     if (status === "OK") {
+                                        this.directionsDisplay.setOptions({ preserveViewport: true });
                                         this.directionsDisplay.setDirections(response);
                                         if(directionsPanelRef) {
                                             this.directionsDisplay.setPanel(directionsPanelRef);
@@ -97,6 +98,18 @@ export default {
                     }
                 });
             });
+        },
+        geocode(place) {
+            var geocoder = new window.google.maps.Geocoder;
+            return new Promise((resolve, reject) => {
+                geocoder.geocode({"address": place}, (results, status) => {
+                    if(status !== "OK") {
+                        reject();
+                    } else {
+                        resolve(results[0].geometry.location);
+                    }
+                });
+            });   
         },
         getDistanceInKm(point1, point2) {
             var p = 0.017453292519943295;    // Math.PI / 180

@@ -6,6 +6,7 @@ const state = {
     destination: null,
     directionsData: null,
     driver: null,
+    trip: null, // the trip data is received in the trip_accepted socket event
     tripRequest: null, // trip request as received by the driver
 }
 
@@ -38,6 +39,9 @@ const actions = {
     },
     setTripRequest({ commit }, tripRequest) {
         commit('SET_TRIP_REQUEST', tripRequest);
+    },
+    setTrip({ commit }, trip) {
+        commit('SET_TRIP', trip);
     }
 }
 
@@ -60,6 +64,9 @@ const mutations = {
     },
     'SET_TRIP_REQUEST'(state, tripRequest) {
         state.tripRequest = tripRequest;
+    },
+    'SET_TRIP'(state, trip) {
+        state.trip = trip;
     }
 }
 
