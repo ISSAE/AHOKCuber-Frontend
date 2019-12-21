@@ -37,7 +37,9 @@ export default {
   created() {
   },
   mounted() {
+    this.preserveViewport = false;
     this.$store.dispatch("setDirectionsData", null);
+    this.preserveViewport = false;
     this.drawRouteAsync(this.$refs.map, this.$refs.directionsPanel)
     .then((directionsResult) => {
       const leg = directionsResult.routes[0].legs[0]; // contains the directions data + other stuff

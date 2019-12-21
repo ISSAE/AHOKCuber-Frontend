@@ -17,8 +17,8 @@
         style="width: 100%; height: 100%;"
       ></gmap-map>
       <div class="trip-request-card" v-if="tripRequest && directionsData">
-        <h6>De: {{tripRequest.start}}</h6>
-        <h6>À: {{tripRequest.destination}}</h6>
+        <h6>De: {{tripRequest.start.text}}</h6>
+        <h6>À: {{tripRequest.destination.text}}</h6>
         <h4>{{directionsData.distance.text}} - {{tripRequest.price}} - {{directionsData.duration.text}}</h4>
         <button @click="acceptRequest" class="btn btn-primary btn-block">Accepter</button>
         <button @click="declineRequest" class="btn btn-default btn-block">Refuser</button>
@@ -40,6 +40,9 @@ export default {
   created() {
   },
   mounted() {
+    /**
+     * The TripRequest screen is exclusive for the driver and it shows a client trip request
+     */
     this.drawRouteAsync(this.$refs.map)
     .then((directionsResult) => {
         const leg = directionsResult.routes[0].legs[0]; // contains the directions data + other stuff
@@ -48,19 +51,16 @@ export default {
         directionsData.duration = leg.duration;
         directionsData.steps = leg.steps;
         this.directionsData = directionsData;
-        //this.$store.dispatch("setDirectionsData", directionsData);
     });
   },
   methods: {
     acceptRequest() {
       this.getCurrentLocationAsync()
-      .then(pos => { 
-        console.log(this.start);  
-        this.$store.dispatch("setDestination", {lat: this.start.lat, lng: this.start.lng});
+      .then(pos => {      
+        this.$store.dispatch("setDestination", this.tripRequest.start.coords);
         this.$store.dispatch("setStart", {lat: pos.lat, lng: pos.lng});
         socket.emit('trip_accepted', this.tripRequest.client.id);
         this.$router.push("/directions");
-        
       }) 
       
     },
@@ -77,8 +77,6 @@ export default {
   },
   computed: {
     ...mapState({
-      start: state => state.mapStore.start,
-      destination: state => state.mapStore.destination,
       mapCenter: state => state.mapStore.mapCenter,
       tripRequest: state => state.mapStore.tripRequest
     })

@@ -67,6 +67,7 @@ export default {
                                    clientDestination: JSON.stringify(this.destination), driver: driverId});
       socket.on('trip_accepted', (data) => {
         let driver = data.driver;
+        this.$store.dispatch("setDriver", driver);
         this.$router.push("/driver-coming");
       });
       socket.on('trip_declined', (data) => {

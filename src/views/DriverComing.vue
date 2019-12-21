@@ -86,7 +86,7 @@ export default {
   methods: {
     setDriverArrived() {
       socket.emit("driver_arrived", this.trip.id);
-      window.tripId = this.trip.id;
+      this.$store.dispatch("setTrip", this.trip);
       this.$router.push("/directions");
     },
     setCouldNotMeet() {

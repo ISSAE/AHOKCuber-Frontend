@@ -4,7 +4,9 @@ export default {
     data() {
         return {
             directionsDisplay: null,
-            directionsService: null
+            directionsService: null,
+            currentLocation: null,
+            preserveViewport: true
         };
     },
     created() {
@@ -46,7 +48,7 @@ export default {
                                 },
                                 (response, status) => {
                                     if (status === "OK") {
-                                        this.directionsDisplay.setOptions({ preserveViewport: true });
+                                        this.directionsDisplay.setOptions({ preserveViewport: this.preserveViewport });
                                         this.directionsDisplay.setDirections(response);
                                         if(directionsPanelRef) {
                                             this.directionsDisplay.setPanel(directionsPanelRef);
@@ -79,6 +81,21 @@ export default {
                 });
             });
 
+        },
+        watchCurrentLocationAsync() {
+                var watchId = navigator.geolocation.watchPosition(pos => this.setCurrentLocation(pos), () => {}, {
+                    maximumAge: 3000,
+                    timeout: 5000,
+                    enableHighAccuracy: true,
+                })
+
+        },
+        setCurrentLocation(pos) {
+            console.log(pos.accuracy);
+            if(pos.coords.accuracy < 19) {
+                this.currentLocation = pos;
+            }
+            
         },
         /**
          * 

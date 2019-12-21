@@ -14,6 +14,7 @@ import DriverComing from './views/DriverComing.vue'
 import TripRequest from './views/TripRequest.vue'
 import Idle from './views/Idle.vue'
 import Directions from './views/Directions.vue'
+import TripEnded from './views/TripEnded.vue'
 
 Vue.use(Router)
 
@@ -88,7 +89,12 @@ export default new Router({
       path: '/directions',
       name: 'directions',
       component: Directions
-    },          
+    },  
+    {
+      path: '/trip-ended',
+      name: 'trip-ended',
+      component: TripEnded
+    },       
     {
       path: '/about',
       name: 'about',

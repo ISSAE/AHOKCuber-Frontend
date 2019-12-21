@@ -23,12 +23,19 @@
         style="width: 100%; height: 100%;"
       >
         <gmap-marker
-          :position="currentDriverLocation"
+          :position="currentLocationCoords"
           :clickable="false"
           :draggable="false"
           :icon="driverPositionMarkerIcon"
         ></gmap-marker>
       </gmap-map>
+      <div v-if="currentLocation" style="position: fixed; bottom: 0px; background-color: white;">
+        {{currentLocation.coords.accuracy}}
+      </div>
+      <div class="directions-card" v-if="hasArrived">
+        <h3>Vous êtes arrivé</h3>
+        <button @click="confirmArrived" class="btn btn-primary btn-block">Confirmer</button>
+      </div>
     </div>
   </div>
 </template>
@@ -40,75 +47,137 @@ import DriverPositionImg from "@/assets/images/driver_icon.png";
 export default {
   data() {
     return {
-      currentDriverLocation: null,
       activeSteps: [],
       trip: null,
-      zoomLevel: 10
+      zoomLevel: 10,
+      hasArrived: false,
+      directionsResult: null,
+      currentLocationCoords: {lat: 0, lng: 0}
     };
   },
   created() {},
   mounted() {
+    /**
+     * In the directions screen, for the the driver:
+     * 1. Show directions from the driver position to the client start point
+     * 1. Listen to trip_updated and wait for the trip status to become CLIENT_PICKED_UP
+     * 2. When the event happens, change the directions destination to the client's destination
+     * 3. In case the status becomes COULD_NOT_MEET because the client marked it as so, an alert
+     * is displayed and we return to the home screen
+     * 3. Follow the directions
+     * 4. Listen to trip_updated and wait for trip status to become FINISHED,
+     * in which case we go the trip-ended screen
+     *
+     * In the directions screen, for the client:
+     * 1. This screen only shows after the driver has arrived
+     * 2. Show directions and the driver position as he's driving the client
+     * 3. When the GPS detects that we're less than 300 meters from the destination,
+     * a button pops up asking the client to confirm arrival
+     * 4. When the client confirms arrival, we send the arrived_to_dest event
+     * 5. After this, we go the trip-ended screen
+     */
+
+    this.watchCurrentLocationAsync();
     this.drawRouteAsync(this.$refs.map, this.$refs.directionsPanel).then(
       directionsResult => {
-        this.pollDirections(directionsResult);
+        this.directionsResult = directionsResult;
       }
     );
-
-    socket.on("trip_updated", trip => {
-      console.log("trip_updated:", trip);
-      this.trip = trip;
-      if (trip.status == "CLIENT_PICKED_UP") {
-        console.log(this.tripRequest);
-        this.geocode(this.tripRequest.destination).then(destinationCoords => {
-          this.$store.dispatch("setDestination", {
-            lat: destinationCoords.lat(),
-            lng: destinationCoords.lng()
-          });
-          this.drawRouteAsync(this.$refs.map, this.$refs.directionsPanel).then(
-            directionsResult => {
-              this.pollDirections(directionsResult);
-            }
-          );
-        });
-      }
-    });
+    if (localStorage.getItem("user_type") == "driver") {
+      this.listenToTripUpdates();
+    }
   },
   methods: {
-    setArrivedToDestination() {
-      socket.emit("arrived_to_dest", this.trip.id);
+    listenToTripUpdates() {
+      socket.on("trip_updated", trip => {
+        this.trip = trip;
+        if (trip.status == "CLIENT_PICKED_UP") {
+          this.onClientPickedUp();
+        } else if (trip.status == "COULD_NOT_MEET") {
+          this.onCouldNotMeet();
+        } else if (trip.status == "FINISHED") {
+          this.onFinished();
+        }
+      });
     },
-    pollDirections(directionsResult) {
-      setInterval(() => {
-        this.getCurrentLocationAsync().then(pos => {
-          console.log("driver location");
-          this.currentDriverLocation = {
-            lat: parseFloat(pos.lat.toFixed(5)),
-            lng: parseFloat(pos.lng.toFixed(5))
-          };
-          this.$store.dispatch("setMapCenter", this.currentDriverLocation);
-          this.showDirections(directionsResult);
-        });
-      }, 400);
+    /**
+     * Driver-specific function
+     */
+    onClientPickedUp() {
+      this.$store.dispatch(
+        "setDestination",
+        this.tripRequest.destination.coords
+      );
+      this.drawRouteAsync(this.$refs.map, this.$refs.directionsPanel).then(
+        directionsResult => {
+          this.directionsResult = directionsResult;
+        }
+      );
+    },
+    /**
+     * Driver-specific function
+     */
+    onCouldNotMeet() {
+      alert("La rencontre a échouée. Retour à la page d'accueil.");
+      this.$store.dispatch("setTripRequest", null);
+      this.$store.dispatch("setStart", null);
+      this.$store.dispatch("setDestination", null);
+      this.$router.push("/idle");
+    },
+    /**
+     * Driver-specific function
+     */
+    onFinished() {
+      this.$router.push("/trip-ended");
     },
     showDirections(directionsResult) {
       this.zoomLevel = 19;
       const leg = directionsResult.routes[0].legs[0]; // contains the directions data + other stuff
       const steps = leg.steps;
-      this.activeSteps = [];
+      var stepIndex = 0;
       for (let step of steps) {
-        console.log(this.currentDriverLocation);
-
-        var distanceToStep = this.getDistanceInKm(this.currentDriverLocation, {
+        console.log(step);
+        var distanceToStep = this.getDistanceInKm(this.currentLocationCoords, {
           lat: step.start_location.lat(),
           lng: step.start_location.lng()
         });
         if (distanceToStep < 0.2) {
-          this.activeSteps.push(step);
+          if (
+            !this.activeSteps.find(s => s.instructions == step.instructions)
+          ) {
+            this.activeSteps.push(step);
+          }
+          if (
+            stepIndex == steps.length - 1 &&
+            localStorage.getItem("user_type") == "client"
+          ) {
+            this.hasArrived = true;
+          }
+        } else {
+          if (this.activeSteps.find(s => s.instructions == step.instructions)) {
+            this.activeSteps = [];
+          }
         }
+        stepIndex++;
+      }
+    },
+    confirmArrived() {
+      socket.emit("arrived_to_dest", this.storeTrip.id);
+      this.$router.push("/trip-ended");
+    }
+  },
+  watch: {
+    currentLocation() {
+      if(this.currentLocation == null) {
+        return;
+      }
+      this.currentLocationCoords = { lat: this.currentLocation.coords.latitude, lng: this.currentLocation.coords.longitude}
+      this.$store.dispatch("setMapCenter", this.currentLocationCoords);
+      if(this.directionsResult) {
+        this.showDirections(this.directionsResult);
       }
     }
   },
-  watch: {},
   computed: {
     driverPositionMarkerIcon() {
       return {
@@ -121,7 +190,8 @@ export default {
       start: state => state.mapStore.start,
       destination: state => state.mapStore.destination,
       driver: state => state.mapStore.driver,
-      tripRequest: state => state.mapStore.tripRequest
+      tripRequest: state => state.mapStore.tripRequest,
+      storeTrip: state => state.mapStore.trip
     })
   }
 };

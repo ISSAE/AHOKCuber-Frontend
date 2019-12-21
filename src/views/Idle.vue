@@ -49,19 +49,20 @@ export default {
     });
     socket.on('request_trip', (data) => {
       console.log(data);
-      let clientLocation = data.location;
-      let clientDestination = data.destination;
+      let clientLocation = JSON.parse(data.location); // coords form
+      let clientDestination = JSON.parse(data.destination); // coords form
       let client = data.client;
-      this.getCoordinatesPlace(JSON.parse(clientLocation)).then(place => {
-          var tripStart = place;
-          var tripEnd = "";
-          this.getCoordinatesPlace(JSON.parse(clientDestination)).then(endPlace => {
+      this.getCoordinatesPlace(clientLocation).then(place => {
+          var tripStart = place; // human-readable form
+          var tripEnd = ""; // human-readable form
+          this.getCoordinatesPlace(clientDestination).then(endPlace => {
             tripEnd = endPlace;
-            let tripRequest = {start: tripStart, destination: tripEnd, client: client}; 
+            let tripRequest = {start: {text: tripStart, coords: clientLocation}, 
+            destination: {text: tripEnd, coords: clientDestination}, client: client}; 
             this.$store.dispatch("setTripRequest", tripRequest);
-            this.$store.dispatch("setMapCenter", JSON.parse(clientLocation));
-            this.$store.dispatch("setStart", JSON.parse(clientLocation));
-            this.$store.dispatch("setDestination", JSON.parse(clientDestination));
+            this.$store.dispatch("setMapCenter", tripRequest.start.coords);
+            this.$store.dispatch("setStart", tripRequest.start.coords);
+            this.$store.dispatch("setDestination", tripRequest.destination.coords);
             this.$router.push("/trip-request");
           });
       });
